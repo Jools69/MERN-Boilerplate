@@ -4,6 +4,7 @@ import App from './App';
 import Signup from './auth/Signup';
 import Signin from './auth/Signin';
 import Activate from './auth/Activate';
+import Signout from './auth/Signout';
 
 const Routes = () => {
     return (
@@ -12,6 +13,7 @@ const Routes = () => {
                 <Route path="/" exact component={App}/>
                 <Route path="/signup" component={Signup} />
                 <Route path="/signin" component={Signin} />
+                <Route path="/signout" component={Signout} />
                 <Route path="/activate/:token" component={Activate} />
             </Switch>
         </BrowserRouter>

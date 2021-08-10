@@ -52,14 +52,14 @@ const Activate = ({ match }) => {
                 {error && <div class="col-6 offset-3">
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {errorMsg}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
                     </div>
                 </div>}
                 {/* {activated && <h2>Awesome! Your account has been successfully activated - please sign in!</h2>} */}
                 {activated && <div class="col-6 offset-3">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         Awesome! Your account has been successfully activated - please sign in {name}!
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
                     </div>
                 </div>}
                 {activated && <a href="/signin" className="btn btn-outline-primary">Sign In</a>}

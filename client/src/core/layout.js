@@ -1,4 +1,6 @@
 import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
+import { isAuth } from '../auth/helpers';
 
 const Layout = ({ location, children }) => {
 
@@ -14,9 +16,19 @@ const Layout = ({ location, children }) => {
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div className="navbar-nav"></div>
                         <div className="navbar-nav ms-auto">
-                            <a className={"nav-link px-4 fw-bold " + (location.pathname === '/' ? 'active' : '')} href="/">Home</a>
-                            <a className={"nav-link px-4 fw-bold " + (location.pathname === '/signup' ? 'active' : '')} href="/signup">Sign Up</a>
-                            <a className={"nav-link px-4 fw-bold " + (location.pathname === '/signin' ? 'active' : '')} href="/signin">Sign In</a>
+                            <Link className={"nav-link mx-4 fw-bold " + (location && location.pathname === '/' ? 'active border-bottom border-3 border-white' : '')} to="/">Home</Link>
+                            {isAuth() ? '' : <Link className={"nav-link mx-4 fw-bold " + (location && location.pathname === '/signup' ? 'active border-bottom border-3 border-white' : '')} to="/signup">Sign Up</Link>}
+                            {isAuth() ? null : <Link className={"nav-link mx-4 fw-bold " + (location && location.pathname === '/signin' ? 'active border-bottom border-3 border-white' : '')} to="/signin">Sign In</Link>}
+                            {isAuth() ? <Link className={"nav-link mx-4 fw-bold " + (location && location.pathname === '/signout' ? 'active border-bottom border-3 border-white' : '')} to="/signout">Sign Out</Link> : null}
+                            {isAuth() && <Link className="nav-link mx-4 fw-bold text-white" to="/profile">
+                                <div className="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
+                                    </svg>
+                                    <span className="text-white px-2">{isAuth().name}</span>
+                                </div>
+                            </Link>}
                         </div>
                     </div>
                 </div>

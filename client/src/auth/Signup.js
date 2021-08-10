@@ -11,10 +11,13 @@ const Signup = (props) => {
         name: "",
         email: "",
         password: "",
-        submitting: false
+        submitting: false,
+        signedUp: false,
+        error: false,
+        msg: ''
     });
 
-    const { name, email, password, submitting } = state;
+    const { name, email, password, submitting, signedUp, error, msg } = state;
 
     const handleChange = (attr) => (e) => {
         setState({...state, [attr]: e.target.value});
@@ -40,11 +43,12 @@ const Signup = (props) => {
                 password: "",
                 submitting: false
             });
-            toast.success(response.data.message);
+            setState({...state, signedUp: true, msg: response.data.message});
+            // toast.success(response.data.message);
         })
         .catch((err) => {
-            setState({...state, submitting: false });
-            toast.error(err.response.data.error);
+            setState({...state, submitting: false, signedUp: false, error: true, msg: err.response.data.error });
+            // toast.error(err.response.data.error);
         });
     }
 
@@ -73,6 +77,19 @@ const Signup = (props) => {
             <div className="col-md-6 offset-md-3">
                 <ToastContainer position="top-center"/>
                 <h1 className="py-5 text-center">Sign Up</h1>
+                {error && <div class="col-6 offset-3">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {msg}
+                        {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
+                    </div>
+                </div>}
+                {/* {activated && <h2>Awesome! Your account has been successfully activated - please sign in!</h2>} */}
+                {signedUp && <div class="col-6 offset-3">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {msg}
+                        {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
+                    </div>
+                </div>}
                 {form}
             </div>
         </Layout>
