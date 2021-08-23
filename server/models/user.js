@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+// const crypto = require('crypto');
+
+const saltRounds = 12;
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -16,11 +19,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true
     },
-    hashedPassword: {
+    password: {
         type: String,
-        //required: true,
+        required: true
     },
-    salt:  String,
     role: {
         type: String,
         default: 'subscriber'
@@ -29,44 +31,32 @@ const userSchema = new mongoose.Schema({
         data: String,
         default: ''
     }
-}, {timestamps: true});
-
-// Schema virtual properties
-userSchema.virtual('password')
-.set(function(password) {
-    // this._password = password;
-    this.salt = this.makeSalt();
-    const hashedPassword = this.encryptPassword(password)
-    this.hashedPassword = hashedPassword;
-});
-// .get(function() {
-//     return this._password;
-// })
+}, { timestamps: true });
 
 // Schema methods
 userSchema.methods = {
-    authenticate: function(password) {
-        return this.encryptPassword(password) === this.hashedPassword;
-    },
-    encryptPassword: function(password) {
-        if(!password)
-            return '';
-        try {
-            const hash = crypto.createHmac('sha256', this.salt).update(password).digest('hex');
-            return hash;
-        } catch (err) {
-            console.log(err);
-            return '';
-        }
-    },
-    makeSalt: function() {
-        return Math.round(new Date().valueOf() * Math.random()) + '';
-    },
+    authenticate: async function (password) {
+        return await bcrypt.compare(password, this.password);
+    }
 };
 
-// userSchema.pre('save', function(next) {
-//     console.log('In Pre-Save');
-//     return next(new Error('Ooof - F in the chat!'));
-// });
+// Schema middleware
+// 
+userSchema.pre('save', async function (next) {
+    if (!this.isNew && this.isModified('password')) {
+        console.log('Password was changed');
+        try {
+            const hash = await bcrypt.hash(this.password, saltRounds)
+            this.password = hash;
+            return next();
+        }
+        catch (err) {
+            console.log(err);
+            return next(err);
+        }
+    }
+    console.log('Password was NOT changed');
+    return next();
+});
 
 module.exports = mongoose.model('User', userSchema);

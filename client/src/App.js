@@ -1,4 +1,4 @@
-import Layout from './core/layout';
+import Layout from './core/Layout';
 
 const App = (props) => {
   return (

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import Layout from '../core/layout';
+import Layout from '../core/Layout';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 const Signup = (props) => {
@@ -20,14 +19,14 @@ const Signup = (props) => {
     const { name, email, password, submitting, signedUp, error, msg } = state;
 
     const handleChange = (attr) => (e) => {
-        setState({...state, [attr]: e.target.value});
+        setState({...state, [attr]: e.target.value, error: false});
     }
 
     const handleSubmit = (e) => {
         // Stop the form refreshing
         e.preventDefault();
 
-        setState({...state, submitting:true});
+        setState({...state, submitting:true, error: false, msg: '', signedUp: false});
 
         // Build an axios call to the sign up end point.
         axios({
@@ -73,18 +72,18 @@ const Signup = (props) => {
     );
 
     return (
-        <Layout location={props.location}>
+        <Layout>
             <div className="col-md-6 offset-md-3">
                 <ToastContainer position="top-center"/>
                 <h1 className="py-5 text-center">Sign Up</h1>
-                {error && <div class="col-6 offset-3">
+                {error && <div>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {msg}
                         {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
                     </div>
                 </div>}
                 {/* {activated && <h2>Awesome! Your account has been successfully activated - please sign in!</h2>} */}
-                {signedUp && <div class="col-6 offset-3">
+                {signedUp && <div>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {msg}
                         {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Redirect } from 'react-router-dom';
-import Layout from '../core/layout';
+import Layout from '../core/Layout';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { pipelinePrimaryTopicReference } from '@babel/types';
 
 const Activate = ({ match }) => {
 
@@ -17,7 +15,6 @@ const Activate = ({ match }) => {
 
     // Get the token from the URL
     const { token } = match.params;
-    console.log(token, typeof token);
 
     // Decode the token to get the user's name
     const { name } = jwt.decode(token);

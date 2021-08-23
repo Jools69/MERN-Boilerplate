@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+// const crypto = require('crypto');
+
+const saltRounds = 12;
 
 // UserStaging Schema
 const userStagingSchema = new mongoose.Schema({
@@ -16,42 +19,28 @@ const userStagingSchema = new mongoose.Schema({
         unique: true,
         lowercase: true
     },
-    hashedPassword: {
+    password: {
         type: String,
         //required: true,
     },
-    salt:  String,
     stagedAt: {
         type: Date,
         default: Date.now
     }
 }, {timestamps: true});
 
-// Schema virtual properties
-userStagingSchema.virtual('password')
-.set(function(password) {
-    // this._password = password;
-    this.salt = this.makeSalt();
-    const hashedPassword = this.encryptPassword(password)
-    this.hashedPassword = hashedPassword;
+// Schema middleware
+// 
+userStagingSchema.pre('save', async function (next){
+    try {
+        const hash = await bcrypt.hash(this.password, saltRounds)
+        this.password = hash;
+        return next();
+    }
+    catch (err) {
+        console.log(err);
+        return next(err);
+    }    
 });
-
-// Schema methods
-userStagingSchema.methods = {
-    encryptPassword: function(password) {
-        if(!password)
-            return '';
-        try {
-            const hash = crypto.createHmac('sha256', this.salt).update(password).digest('hex');
-            return hash;
-        } catch (err) {
-            console.log(err);
-            return '';
-        }
-    },
-    makeSalt: function() {
-        return Math.round(new Date().valueOf() * Math.random()) + '';
-    },
-};
 
 module.exports = mongoose.model('UserStaging', userStagingSchema);

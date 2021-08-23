@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Layout from '../core/layout';
+import Layout from '../core/Layout';
 import { isAuth, signOut } from '../auth/helpers';
 
 const Signout = (props) => {
@@ -8,7 +8,7 @@ const Signout = (props) => {
     signOut();
 
     return (
-        <Layout location={props.location}>
+        <Layout>
             <div className="col-md-6 offset-md-3 text-center">
                 <h1 className="py-5 text-center">Signed Out</h1>
                 <div>

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { isAuth } from '../auth/helpers';
 
 const Layout = ({ location, children }) => {
@@ -46,4 +46,4 @@ const Layout = ({ location, children }) => {
     );
 }
 
-export default Layout;
+export default withRouter(Layout);
