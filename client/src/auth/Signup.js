@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../core/Layout';
 import axios from 'axios';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
 
 const Signup = (props) => {
 
@@ -43,11 +41,9 @@ const Signup = (props) => {
                 submitting: false
             });
             setState({...state, signedUp: true, msg: response.data.message});
-            // toast.success(response.data.message);
         })
         .catch((err) => {
             setState({...state, submitting: false, signedUp: false, error: true, msg: err.response.data.error });
-            // toast.error(err.response.data.error);
         });
     }
 
@@ -74,7 +70,6 @@ const Signup = (props) => {
     return (
         <Layout>
             <div className="col-md-6 offset-md-3">
-                <ToastContainer position="top-center"/>
                 <h1 className="py-5 text-center">Sign Up</h1>
                 {error && <div>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">

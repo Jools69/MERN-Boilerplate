@@ -7,19 +7,15 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 const Activate = ({ match }) => {
 
-    const [state, setState] = useState({
-        activated: false,
-        error: false,
-        errorMsg: ''
-    });
+    const [activated, setActivated] = useState(false);
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     // Get the token from the URL
     const { token } = match.params;
 
     // Decode the token to get the user's name
     const { name } = jwt.decode(token);
-
-    const { activated, error, errorMsg } = state;
 
     useEffect(() => {
 
@@ -29,12 +25,13 @@ const Activate = ({ match }) => {
             data: { token }
         })
             .then(response => {
-                setState({ ...state, activated: true });
+                setActivated(true);
                 //toast.success(response.data.message);
             })
             .catch((err) => {
-                setState({ ...state, activated: false, error: true, errorMsg: err.response.data.error });
-                //toast.error(err.response.data.error);
+                setActivated(false);
+                setError(true);
+                setErrorMsg(err.response.data.error);
             });
 
     }, []);
@@ -45,14 +42,12 @@ const Activate = ({ match }) => {
                 <ToastContainer position="top-center" />
                 <h1 className="py-5">Account Activation</h1>
                 {!activated && !error && <h2 className="py-5">Hi {name}, activating your account now....</h2>}
-                {/* {error && <h2 className="py-5">Sorry {name}, something went wrong - {errorMsg}</h2>} */}
                 {error && <div class="col-6 offset-3">
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {errorMsg}
                         {/* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> */}
                     </div>
                 </div>}
-                {/* {activated && <h2>Awesome! Your account has been successfully activated - please sign in!</h2>} */}
                 {activated && <div class="col-6 offset-3">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         Awesome! Your account has been successfully activated - please sign in {name}!

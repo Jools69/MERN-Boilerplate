@@ -37,7 +37,7 @@ const AdminRoute = ({ component: Component, ...rest }) => {
   }, []);
 
   return (
-    !authorisationComplete && <Busy />
+    (!authorisationComplete && <Busy />)
     || (
       <Route
         {...rest}

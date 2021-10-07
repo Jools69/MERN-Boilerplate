@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Layout from '../core/Layout';
 import axios from 'axios';
+import { connect } from 'react-redux';
 import { authenticate } from './helpers';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import { signin } from '../redux/actions';
 
 const Signin = (props) => {
 
@@ -34,10 +34,11 @@ const Signin = (props) => {
             setState({ ...state, csrfToken: response.data.csrfToken });
         })
             .catch((err) => {
+                const errorMsg = err.response ? err.response.data.error : `${err}`;
                 setState({
                     ...state,
                     error: true,
-                    errorMsg: err.response.data.error
+                    errorMsg
                 });
             });
     }
@@ -69,16 +70,18 @@ const Signin = (props) => {
                         password: "",
                         submitting: false
                     });
+                    props.signin(response.data.user);
                     // Redirect user based on role.
-                    history.push(response.data.user.role === 'admin' ? '/admin' : '/private');
+                    history.push(response.data.user.role === 'admin' ? '/admin' : '/dashboard');
                 });
             })
             .catch((err) => {
+                const errMsg = err.response ? err.response.data.error : err.message;
                 setState({
                     ...state,
                     submitting: false,
                     error: true,
-                    errorMsg: err.response.data.error
+                    errorMsg: errMsg
                 });
             });
     }
@@ -95,7 +98,7 @@ const Signin = (props) => {
             </div>
             <div>
                 <button className="btn btn-primary mt-4" onClick={handleSubmit} disabled={submitting ? true : false}>
-                    {submitting ? <><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Submitting... </> : 'Submit'}
+                    {submitting ? <><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Logging in... </> : 'Login'}
                 </button>
             </div>
         </form>
@@ -104,10 +107,10 @@ const Signin = (props) => {
     return (
         <Layout>
             <div className="col-md-6 offset-md-3">
-                {error && <div class="mt-5">
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {error && <div className="mt-5">
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
                         {errorMsg}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>}
                 <h1 className="py-5 text-center">Sign In</h1>
@@ -117,4 +120,4 @@ const Signin = (props) => {
     )
 };
 
-export default Signin;
+export default connect(null, { signin })(Signin);

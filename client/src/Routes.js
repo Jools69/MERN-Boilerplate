@@ -7,7 +7,7 @@ import Signup from './auth/Signup';
 import Signin from './auth/Signin';
 import Activate from './auth/Activate';
 import Signout from './auth/Signout';
-import Private from './core/Private';
+import Dashboard from './core/Dashboard';
 import Admin from './core/Admin';
 
 const Routes = () => {
@@ -19,7 +19,7 @@ const Routes = () => {
                 <Route path="/signin" component={Signin} />
                 <Route path="/signout" component={Signout} />
                 <Route path="/activate/:token" component={Activate} />
-                <PrivateRoute path="/private" component={Private} />
+                <PrivateRoute path="/dashboard" component={Dashboard} />
                 <AdminRoute path="/admin" component={Admin} />
             </Switch>
         </BrowserRouter>

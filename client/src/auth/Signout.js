@@ -1,11 +1,15 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import Layout from '../core/Layout';
-import { isAuth, signOut } from '../auth/helpers';
+import { isAuth } from '../auth/helpers';
+import { signout } from '../redux/actions';
 
 const Signout = (props) => {
 
     const user = isAuth();
-    signOut();
+    // update local storage and remove the session cookie.
+    // NOTE: MOVE THIS TO THE ACTION CREATOR WHEN REFACTORING!!!!!!!
+    props.signout();
 
     return (
         <Layout>
@@ -22,4 +26,4 @@ const Signout = (props) => {
     )
 };
 
-export default Signout;
+export default connect(null, { signout })(Signout);

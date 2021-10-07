@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const UserStaging = require('../models/userStaging');
+const Landlord = require('../models/landlord');
 const sgMail = require('@sendgrid/mail');
 const jwt = require('jsonwebtoken');
 
@@ -121,12 +122,21 @@ exports.activate = async (req, res, next) => {
                 });
             }
 
-            // The staged user was found - we now need to create permanent user from their saved details.
+            // The staged user was found - we now need to create a permanent user from their saved details.
             const { password } = stagedUser;
             const newUser = new User({ name, email, password });
 
-            await newUser.save();
+            const savedUser = await newUser.save();
 
+            // Create a new lanbdlord instance
+            const newLandlord = new Landlord({
+                userId: savedUser._id
+            });
+
+            const savedLandlord = await newLandlord.save();
+
+            console.log("Landlord = ", savedLandlord);
+            
             // Now we've saved the new user, delete the staged user entry
             await UserStaging.deleteOne({ email });
 
@@ -243,7 +253,6 @@ exports.deliverCsrfToken = (req, res) => {
 
 exports.showCookies = (req, res, next) => {
     try {
-        console.log(req.cookies);
         return next();
     }
     catch (err) {
