@@ -33,7 +33,7 @@ const Activate = ({ match }) => {
                 setError(true);
                 setErrorMsg(err.response.data.error);
             });
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

@@ -22,14 +22,9 @@ const propertySchema = new Schema({
         type: String,
         required: true
     },
-    county: {
-        type: String
-    },
-    country: {
-        type: String
-    },
     postcode: {
-        type: String
+        type: String,
+        required: true
     },
     currency: {
         code: {
@@ -47,7 +42,8 @@ const propertySchema = new Schema({
     },
     propertyType: {
         type: String,
-        enum: ['Rent a room','Furnished Holiday let', 'Other Property Furnished', 'Other Property Unfurnished', 'Other']
+        enum: ['Rent a room','Furnished Holiday let', 'Other Property Furnished', 'Other Property Unfurnished', 'Other'],
+        default: 'Other Property Unfurnished'
     }
 });
 

@@ -1,0 +1,87 @@
+.modalContainer {
+    /* height: 100vh;
+    width: 100vw;  YOU GET SCROLL BARS ON THE MAIN VIEW WITH THESE ATTRS SET */     
+    visibility: hidden;
+    opacity: 0;
+    transition: 300ms;
+}
+
+.modalContainer.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modalContainer.hide {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(72, 72, 72);
+    opacity: 0.8;
+    z-index: 1;
+    transition: all 500ms;
+}
+
+.modalForeground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalParent {
+    display: flex;
+    z-index: 2;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    min-width: 30%;
+    max-width: 70%;
+    min-height: 30%;
+    max-height: 90%;
+    border-radius: 10px;
+}
+
+.modalTitle {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    border-bottom: 1px solid lightgray;
+}
+
+.modalFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid lightgray;
+    padding: 20px;
+}
+
+
+.modalFooterContainer {
+    display: flex;
+    justify-content: space-evenly;
+    width: 60%;
+}
+
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 5%;
+    overflow-y: auto;
+}

@@ -1,9 +1,11 @@
 const User = require('../models/user');
 const UserStaging = require('../models/userStaging');
 const Landlord = require('../models/landlord');
+const ExpressError = require('../utils/ExpressError');
 const sgMail = require('@sendgrid/mail');
 const jwt = require('jsonwebtoken');
 
+// This is to emulate API delay during local host testing
 const timeOut = 2000;
 
 exports.signup = async (req, res, next) => {
@@ -16,9 +18,7 @@ exports.signup = async (req, res, next) => {
 
         // If the user exists, send back an error message
         if (existingUser) {
-            return res.status(400).json({
-                error: 'Email is already in use'
-            });
+            return next(new ExpressError('Email is already in use', 400));
         }
 
         // Check to see if the user has already signed up but not activated
@@ -34,9 +34,7 @@ exports.signup = async (req, res, next) => {
                 await existingStagedUser.remove();
             }
             else {
-                return res.status(400).json({
-                    error: 'Email is already signed up - please click the link in your verification email'
-                });
+                return next(new ExpressError('Email is already signed up - please click the link in your verification email', 400));
             }
         }
 
@@ -46,7 +44,6 @@ exports.signup = async (req, res, next) => {
             name,
             password
         })
-        console.log(stagedUser);
 
         // save it to the DB.
         await stagedUser.save();
@@ -78,10 +75,7 @@ exports.signup = async (req, res, next) => {
                 message: `Email has been sent to ${email}. Follow the instructions to activate your account`
             });
         }).catch((err) => {
-            console.log(`Error sending email to ${email}:`, err);
-            res.status(500).json({
-                error: err.message
-            })
+            return next(new ExpressError(err.message, 500));
         });
     }
     catch (err) {
@@ -96,9 +90,7 @@ exports.activate = async (req, res, next) => {
             let msg = err.message;
             if (err.name === 'TokenExpiredError')
                 msg = "Activation Link expired, please sign-up again."
-            return res.status(400).json({
-                error: msg
-            });
+            return next(new ExpressError(msg, 400));
         }
         // Pull the verified user email out of the token and search for it in the staging table.
         const { name, email } = signupDetails;
@@ -135,8 +127,6 @@ exports.activate = async (req, res, next) => {
 
             const savedLandlord = await newLandlord.save();
 
-            console.log("Landlord = ", savedLandlord);
-            
             // Now we've saved the new user, delete the staged user entry
             await UserStaging.deleteOne({ email });
 
@@ -144,28 +134,25 @@ exports.activate = async (req, res, next) => {
                 message: `${name}, your account was activated successfully! Please sign in.`
             });
         } catch (err) {
-            return res.status(400).json({
-                error: err.message
-            });
+            return next(new ExpressError(err.message, 400));
         }
     });
 }
 
-exports.signin = async (req, res) => {
+exports.signin = async (req, res, next) => {
     // Pull sign in parameters from request body.
     const { email, password } = req.body;
 
     // Check to see if we have the provided email address registered in the database
     const user = await User.findOne({ email }).exec(async (err, user) => {
         if (err) {
-            return res.status(400).json({
-                error: err.message
-            });
+            return next(new ExpressError(err.message, 400));
+            // return res.status(400).json({
+            //     error: err.message
+            // });
         }
         if (!user || !await user.authenticate(password)) {
-            return res.status(511).json({
-                error: 'The email address or password was invalid - please try again'
-            });
+            return next(new ExpressError('The email address or password was invalid - please try again', 511));
         }
 
         // if we get here, the user exists and the provided password is correct.
@@ -204,9 +191,7 @@ exports.authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.status(401).json({
-            error: 'Sorry, but you are not authorised to do this.'
-        });
+        return next(new ExpressError('Sorry, but you are not authorised to do this.', 401));
     }
 
     // Extract the token portion of the auth header (i.e. after the "Bearer " part);
@@ -221,9 +206,7 @@ exports.authenticate = async (req, res, next) => {
                 msg = "Refresh Token";
                 status = 499;   // Custom response for client to look out for.
             }
-            return res.status(status).json({
-                error: msg
-            });
+            return next(new ExpressError(msg, status));
         }
         // The user object decoded from the token is valid here so add it to the req object.
         req.user = user;
@@ -238,9 +221,7 @@ exports.adminOnly = (req, res, next) => {
     // this middleware has to be called *after* the authenticate middleware, which populates the req.user object.
     // If the authenticated user is an admin, next() is called, else an error is sent back on the response.
     if (req.user.role !== 'admin') {
-        return res.status(403).json({
-            err: 'Sorry, but you are not authorised to do this.'
-        });
+        return next(new ExpressError('Sorry, but you are not authorised to do this.', 403));
     }
     // User is admin so continue with the route handling.
     return next();
@@ -256,26 +237,97 @@ exports.showCookies = (req, res, next) => {
         return next();
     }
     catch (err) {
-        return res.status(403).json({
-            err: err.message
-        });
+        return next(new ExpressError(err.message, 403));
     }
 }
 
-exports.updatePassword = async (req, res) => {
+exports.forgotPassword = async (req, res, next) => {
+
+    // Retrieve the user's email address from the request body.
+    const { email } = req.body;
+
     try {
-        const { email, password } = req.body;
+        // Find the user registered to that email address (if one exists)
         const user = await User.findOne({ email });
 
-        user.password = password;
-        await user.save();
+        if (user) {
+            console.log(user.resetPasswordLink);
+            // Generate a token containing the user ID of the registered user.
+            const token = jwt.sign({ id: user._id }, process.env.JWT_RESET_PASSWORD, { expiresIn: '10m' });
+
+            // Add the token to the user's DB record for checking against later.
+            // await User.findOneAndUpdate({ _id: user._id }, { resetPasswordLink: token });
+            user.resetPasswordLink = token;
+            await user.save();
+
+            // Now create and send the email, including the link and token for resetting the password.
+            // Set the sendgrid API Key.
+            sgMail.setApiKey(process.env.MAIL_API_KEY);
+
+            // Build the Password Reset link email.
+            const msg = {
+                to: email,
+                from: process.env.EMAIL_FROM,
+                subject: 'RENTrackr Password Reset',
+                text: 'Please click the link below to reset your password. If you didn\'t request a password reset, please contact us.',
+                html: `
+                    <h1>Reset your password</h1>
+                    <p>Please click the link below to reset your password. </p>
+                    <p>If you didn't request a password reset, please contact us.</p>
+                    <a href="${process.env.CLIENT_URL}/password/reset/${token}">Reset Password</a>
+                    <hr>
+                    <p>This email may contain sensitive information</p>
+                    <p>${process.env.CLIENT_URL}</p>`,
+            }
+
+            sgMail.send(msg).then().catch((err) => {
+                return next(new ExpressError(err.message, 500));
+            });
+        }
+
         return res.json({
-            message: 'Password updated successfully'
+            message: `If an account exists for ${email}, you will be sent a password reset link.`
+        });
+
+    } catch (err) {
+        return next(new ExpressError(err.message, 400));
+    }
+}
+
+exports.updatePassword = async (req, res, next) => {
+    try {
+        const { token, password } = req.body;
+
+        // validate the token received from the request body - it should just contain the user'd _id
+        jwt.verify(token, process.env.JWT_RESET_PASSWORD, async (err, payload) => {
+            if (err) {
+                let msg = err.message;
+                if (err.name === 'TokenExpiredError')
+                    msg = "Password Reset Link expired, please click on forgot password again."
+                return next(new ExpressError(msg, 400));
+            }
+        
+            // The token is valid, so get the user from the DB associated with the password reset request
+            const user = await User.findById(payload.id);
+            if (!user) {
+                return next(new ExpressError("The requesting user account cannot be found", 404));
+            }
+
+            // Check that the user's DB record contains the provided token too (to ensure they did request the change)
+            if (user.resetPasswordLink !== token) {
+                return next(new ExpressError("The specified user did not request a password reset", 400));
+            }
+
+            // Everything's valid by here, so update the user's password, and clear the resetPassworkLink in the DB.
+            user.password = password;
+            user.resetPasswordLink = "";
+            await user.save();
+            return res.json({
+                message: 'Password updated successfully'
+            });
         });
     }
-    catch(err) {
-        return res.status(400).json({
-            error: err.message
-        });
+    catch (err) {
+        return next(new ExpressError(err.message, 400));
     }
 }

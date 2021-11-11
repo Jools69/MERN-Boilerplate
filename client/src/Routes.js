@@ -8,6 +8,8 @@ import Signin from './auth/Signin';
 import Activate from './auth/Activate';
 import Signout from './auth/Signout';
 import Dashboard from './core/Dashboard';
+import ForgotPassword from './auth/ForgotPassword';
+import ResetPassword from './auth/ResetPassword';
 import Admin from './core/Admin';
 
 const Routes = () => {
@@ -19,6 +21,8 @@ const Routes = () => {
                 <Route path="/signin" component={Signin} />
                 <Route path="/signout" component={Signout} />
                 <Route path="/activate/:token" component={Activate} />
+                <Route path="/password/forgot" component={ForgotPassword} />
+                <Route path="/password/reset/:token" component={ResetPassword} />
                 <PrivateRoute path="/dashboard" component={Dashboard} />
                 <AdminRoute path="/admin" component={Admin} />
             </Switch>

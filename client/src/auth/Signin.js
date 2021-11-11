@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import Layout from '../core/Layout';
+import Error from '../core/Error';
+import Success from '../core/Success';
 import axios from 'axios';
 import { connect } from 'react-redux';
 import { authenticate } from './helpers';
-import { signin } from '../redux/actions';
+import { signin, logError, clearError, clearSuccess, saveCSRFToken } from '../redux/actions';
 
 const Signin = (props) => {
 
     const [state, setState] = useState({
         email: "",
         password: "",
-        csrfToken: "",
         submitting: false,
-        error: false,
-        errorMsg: ''
     });
 
     const history = useHistory();
 
-    const { email, password, csrfToken, submitting, error, errorMsg } = state;
+    const { email, password, submitting } = state;
 
     const handleChange = (attr) => (e) => {
         setState({ ...state, [attr]: e.target.value });
@@ -31,35 +30,35 @@ const Signin = (props) => {
             withCredentials: true,
             url: `${process.env.REACT_APP_API}/protect`
         }).then(response => {
-            setState({ ...state, csrfToken: response.data.csrfToken });
+            // setState({ ...state, csrfToken: response.data.csrfToken });
+            props.saveCSRFToken(response.data.csrfToken);
         })
-            .catch((err) => {
-                const errorMsg = err.response ? err.response.data.error : `${err}`;
-                setState({
-                    ...state,
-                    error: true,
-                    errorMsg
-                });
-            });
+        .catch((err) => {
+            const errorMsg = err.response ? err.response.data.error : err.message;
+            props.logError(errorMsg);
+            props.saveCSRFToken('');
+        });
     }
     // Call the endpoint to get the CSRF token
     useEffect(() => {
         getCSRFToken();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSubmit = (e) => {
         // Stop the form refreshing
         e.preventDefault();
 
-        setState({ ...state, submitting: true, error:false, errorMsg: '' });
-
+        setState({ ...state, submitting: true });
+        props.clearError();
+        props.clearSuccess();
         // Build an axios call to the sign up end point.
         axios({
             method: 'POST',
             url: `${process.env.REACT_APP_API}/signin`,
             withCredentials: true,
             headers: {
-                'csrf-token': csrfToken
+                'csrf-token': props.csrfToken
             },
             data: { email: email.trim().toLowerCase(), password }
         })
@@ -70,19 +69,19 @@ const Signin = (props) => {
                         password: "",
                         submitting: false
                     });
+                    // Update User State in Redux Store
                     props.signin(response.data.user);
                     // Redirect user based on role.
                     history.push(response.data.user.role === 'admin' ? '/admin' : '/dashboard');
                 });
             })
             .catch((err) => {
-                const errMsg = err.response ? err.response.data.error : err.message;
                 setState({
                     ...state,
-                    submitting: false,
-                    error: true,
-                    errorMsg: errMsg
+                    submitting: false
                 });
+                const errorMsg = err.response ? err.response.data.error : err.message;
+                props.logError(errorMsg);
             });
     }
 
@@ -107,17 +106,22 @@ const Signin = (props) => {
     return (
         <Layout>
             <div className="col-md-6 offset-md-3">
-                {error && <div className="mt-5">
-                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                        {errorMsg}
-                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>}
+                <Error showClose />
+                <Success showClose />
                 <h1 className="py-5 text-center">Sign In</h1>
                 {form}
+                <div className="py-3">
+                    <Link to="/password/forgot">Forgot your password?</Link>
+                </div>
             </div>
         </Layout>
     )
 };
 
-export default connect(null, { signin })(Signin);
+const mapStateToProps = (state) => {
+    return {
+        csrfToken: state.user.csrfToken
+    };
+}
+
+export default connect(mapStateToProps, { signin, logError, clearError, clearSuccess, saveCSRFToken })(Signin);

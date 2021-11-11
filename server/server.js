@@ -6,11 +6,14 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const mongoSanitize = require('express-mongo-sanitize');
 
+const ExpressError = require('./utils/ExpressError');
+
 require('dotenv').config();
 
 // Import auth router
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
+const userRoutes = require('./routes/users');
+const propertyRoutes = require('./routes/properties');
 
 // Create instance of express.
 const app = express();
@@ -61,17 +64,25 @@ app.use(cookieParser());
 // Use the auth router to handle auth routes.
 app.use('/api', authRoutes);
 // Use the user router to handle user routes.
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes);
+// Use the properties router to handle property routes.
+app.use('/api/properties', propertyRoutes);
+
+// If we get here, an unsupported URL was requested.
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found', 404));
+});
 
 // Handle any previously unhandled errors here - especially CSRF failures.
 app.use(function (err, req, res, next) {
+    const { statusCode = 500 } = err;
     if (err.code === 'EBADCSRFTOKEN') {
         // handle CSRF token errors here
         return res.status(403).json({
             error: 'Forged Request - denied.'
         });
     }
-    return res.status(400).json({
+    return res.status(statusCode).json({
         error: err.message
     });
 })

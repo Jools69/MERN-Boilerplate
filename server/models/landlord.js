@@ -8,8 +8,10 @@ const landlordSchema = new Schema({
     },
     properties: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'Property',
+            property: {
+                type: Schema.Types.ObjectId,
+                ref: 'Property',
+            },
             percentOwned: {
                 type: Number,
                 min: 1,
