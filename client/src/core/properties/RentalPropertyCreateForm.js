@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { createRentalProperty } from '../../redux/actions';
 import RentalPropertyForm from './RentalPropertyForm';
 
-const RentalPropertyCreate = (props) => {
+const RentalPropertyCreateForm = (props) => {
 
     const onSubmit = (formValues) => {
         props.createRentalProperty(formValues);
@@ -17,12 +17,9 @@ const RentalPropertyCreate = (props) => {
                 onSubmit={onSubmit}
                 formId={props.formId}
                 formRef={props.formRef}
-                initialValues={{
-                    name: "Test"
-                }}
             />
         </div>
     );
 }
 
-export default connect(null, {createRentalProperty})(RentalPropertyCreate);
+export default connect(null, {createRentalProperty})(RentalPropertyCreateForm);

@@ -10,15 +10,10 @@ import { logError, clearError, logSuccess, saveCSRFToken } from '../redux/action
 const ResetPassword = (props) => {
 
     const [state, setState] = useState({
-        password: "",
         submitting: false
     });
 
-    const { password, submitting } = state;
-
-    const handleChange = (attr) => (e) => {
-        setState({ ...state, [attr]: e.target.value, error: false });
-    }
+    const { submitting } = state;
 
     const getCSRFToken = async () => {
         axios({
@@ -79,7 +74,8 @@ const ResetPassword = (props) => {
 
         <ResetPasswordForm
             onSubmit={handleSubmit}
-            submitButtonText={"Reset"}
+            submitButtonText={submitting ? "Resetting" : "Reset"}
+            submitting={submitting}
         />
     );
 

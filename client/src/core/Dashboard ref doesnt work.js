@@ -50,14 +50,14 @@ const Dashboard = (props) => {
   const { name } = props.user;
 
   const renderProperties = () => {
-    if (props.landlord.properties) {
+    if (props.landlord.portfolio) {
       const { properties } = props.landlord;
       return (
         <div className="card shadow">
           <div className="card-body">
             <h4 className="card-title">Properties</h4>
             {properties.length > 0 &&
-              <p className="card-text">You currently have {props.landlord.properties.length} properties</p>
+              <p className="card-text">You currently have {props.landlord.portfolio.length} properties</p>
             }
             {properties.length === 0 &&
               <p className="card-text">You have not yet added any properties</p>

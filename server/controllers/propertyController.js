@@ -28,13 +28,13 @@ exports.create = async (req, res, next) => {
         const landlord = await Landlord.findOne({ userId: req.user.id });
 
         // Add the new property
-        landlord.properties.push({ property: newProperty, percentOwned });
+        landlord.portfolio.push({ property: newProperty, percentOwned });
 
         await landlord.save();
 
         return res.json({
             message: 'Property added successfully',
-            newProperty: landlord.properties[landlord.properties.length - 1]
+            newProperty: landlord.portfolio[landlord.portfolio.length - 1]
         });
     }
     catch (err) {
@@ -65,7 +65,12 @@ exports.findById = async (req, res, next) => {
 }
 
 exports.update = (req, res, next) => {
-    next();
+    const { id } = req.params;
+    const { property } = req.body;
+    return res.json({
+        id,
+        property
+    });
 }
 
 exports.delete = async (req, res, next) => {
@@ -81,16 +86,16 @@ exports.delete = async (req, res, next) => {
         const landlord = await Landlord.findOne({ userId: userId });
 
         if (landlord) {
-            // First, get the id of the properties entry that needs to be deleted.
-            const propertyToCheck = landlord.properties.find(p =>  {
+            // First, get the id of the portfolio entry that needs to be deleted.
+            const propertyToCheck = landlord.portfolio.find(p =>  {
                 return p.id.toString() === propertyId;
             });
 
-            // Delete the provided property from the landlord's properties array
-            await Landlord.findByIdAndUpdate(landlord.id, { $pull: { properties: { _id: propertyId } } });
+            // Delete the provided property from the landlord's portfolio array
+            await Landlord.findByIdAndUpdate(landlord.id, { $pull: { portfolio: { _id: propertyId } } });
             
             // Find any other Landlords that "own" the property
-            const otherLandlord = await Landlord.findOne({ 'properties.property': propertyToCheck.property });
+            const otherLandlord = await Landlord.findOne({ 'portfolio.property': propertyToCheck.property });
 
             if (!otherLandlord) {
                 // No other landlord owns this property, so it should be deleted from the Properties collection too.

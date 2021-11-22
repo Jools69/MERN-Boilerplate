@@ -13,11 +13,13 @@ const RentalPropertyForm = (props) => {
         <Form
             initialValues={props.initialValues}
             onSubmit={handleSubmit}
+            onCancel={props.onCancel}
             validate={validate}
-            showSubmitButton={false}
+            showButtons={props.showButtons || false}
+            submitButtonText={props.submitButtonText || "Add"}
             formId={props.formId}
             formRef={props.formRef}
-            render={({ handleSubmit, form, formRef, showSubmitButton }) => {
+            render={({ handleSubmit, onCancel, form, formRef, showButtons, submitButtonText }) => {
                 formRef.current = form;
                 return (
                     <form className="" id={props.formId} onSubmit={handleSubmit}>
@@ -35,7 +37,11 @@ const RentalPropertyForm = (props) => {
                                 <Field name="percentOwned" component={NumberInput} label="Percent Owned" required />
                             </div>
                         </div>
-                        {showSubmitButton && <button className="btn btn-primary" type="submit">Add</button>}
+                        {showButtons && <div className="d-flex justify-content-center mt-4">
+                                            <button className="btn btn-primary mx-2" type="submit">{submitButtonText}</button>
+                                            <button className="btn btn-secondary mx-2" type="button" onClick={onCancel}>Cancel</button>
+                                        </div>
+                        }
                     </form>
                 )}
             }

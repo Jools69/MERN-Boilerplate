@@ -6,7 +6,7 @@ const landlordSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    properties: [
+    portfolio: [
         {
             property: {
                 type: Schema.Types.ObjectId,

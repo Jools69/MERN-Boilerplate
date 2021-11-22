@@ -5,6 +5,7 @@ import {
     SIGN_IN, 
     SIGN_OUT,
     CREATE_PROPERTY,
+    UPDATE_PROPERTY,
     DELETE_PROPERTY,
     LOG_ERROR,
     CLEAR_ERROR,
@@ -55,8 +56,37 @@ export const createRentalProperty = (property) => dispatch => {
             payload: response.data.newProperty
         });
         dispatch({
+            type: CLEAR_ERROR
+        })
+    })
+    .catch(err => {
+        const errMsg = err.response.data.error;
+        dispatch({
             type: LOG_ERROR,
-            payload: ''
+            payload: errMsg
+        });
+    });
+}
+
+export const updateRentalProperty = (id, property) => (dispatch, getState) => {
+
+    const csrfToken = getState().user.csrfToken;
+    
+    // perform an axios POST to the properties url
+    axios({
+        method: 'PUT',
+        url: `${process.env.REACT_APP_API}/properties/${id}`,
+        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}`,
+                   "csrf-token": csrfToken },
+        data: { id, property }
+    })
+    .then(response => {
+        dispatch({
+            type: UPDATE_PROPERTY,
+            payload: response.data.updatedProperty
+        });
+        dispatch({
+            type: CLEAR_ERROR
         })
     })
     .catch(err => {
@@ -86,8 +116,7 @@ export const deleteRentalProperty = (propertyId) => (dispatch, getState) => {
             payload: propertyId
         });
         dispatch({
-            type: LOG_ERROR,
-            payload: ''
+            type: CLEAR_ERROR
         })
     })
     .catch(err => {

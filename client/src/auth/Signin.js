@@ -97,7 +97,7 @@ const Signin = (props) => {
             </div>
             <div>
                 <button className="btn btn-primary mt-4" onClick={handleSubmit} disabled={submitting ? true : false}>
-                    {submitting ? <><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Logging in... </> : 'Login'}
+                    {submitting ? <><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Signing in... </> : 'Sign in'}
                 </button>
             </div>
         </form>

@@ -21,8 +21,9 @@ router.route('/')
 // property-specific routes.
 router.route('/:id')
     .get(authenticate, properties.findById)
-    .put(csrfProtection, authenticate, properties.update)
-    // .delete(csrfProtection, authenticate, properties.delete);
-    .delete(authenticate, properties.delete);
+    .put(authenticate, properties.update)
+    // .put(csrfProtection, authenticate, properties.update)
+    .delete(csrfProtection, authenticate, properties.delete);
+    // .delete(authenticate, properties.delete);
 
 module.exports = router;

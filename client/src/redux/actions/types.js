@@ -2,6 +2,7 @@ export const SIGN_IN = 'sign_in';
 export const SIGN_OUT = 'sign_out';
 export const LOAD_LANDLORD = 'load_landlord';
 export const CREATE_PROPERTY = 'create_property';
+export const UPDATE_PROPERTY = 'update_property';
 export const DELETE_PROPERTY = 'delete_property';
 export const LOG_ERROR = 'log_error';
 export const CLEAR_ERROR = 'clear_error';

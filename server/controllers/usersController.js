@@ -19,11 +19,11 @@ exports.getUser = async (req, res, next) => {
         // if (req.user.id.toString() === user._id.toString()) {
         if (user._id.equals(req.user.id)) {
             // Create simple data structure for testing
-            // Properties collection
+            // portfolio collection
             // Current income for current tax year.
             
             // Retrieve the Landlord details for this User.
-            const landlord = await Landlord.findOne({ userId }).populate('properties.property');
+            const landlord = await Landlord.findOne({ userId }).populate('portfolio.property');
             if(!landlord) {
                 return next(new ExpressError('Cannot retrieve Landlord details', 404));
                 // return res.status(404).json({

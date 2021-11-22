@@ -15,12 +15,15 @@ const ResetPasswordForm = (props) => {
             validate={validate}
             // formId={props.formId}
             submitButtonText={props.submitButtonText}
-            render={(props) => {
+            submittingPassword={props.submitting}
+            render={({submitButtonText, handleSubmit, submittingPassword}) => {
                 return (
-                    <form className="" onSubmit={props.handleSubmit}>
+                    <form className="" onSubmit={handleSubmit}>
                         <Field name="password" type="password" component={TextInput} label="Password" required />
-                        <Field name="passwordValidation" type="password" component={TextInput} label="Re-enter Password" required />
-                        <button className="btn btn-primary mt-3" type="submit">{props.submitButtonText}</button>
+                        <Field name="passwordValidation" type="password" component={TextInput} label="Confirm Password" required />
+                        <button className="btn btn-primary mt-3" type="submit">
+                            {submittingPassword ? <React.Fragment><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> {submitButtonText} </React.Fragment> : `${submitButtonText}`}
+                        </button>
                     </form>
                 );
             }

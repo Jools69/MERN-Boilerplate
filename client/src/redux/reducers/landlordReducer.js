@@ -5,18 +5,18 @@ let initialState = {
     landlord: {}
 };
 
-let properties;
+let portfolio;
 
 const landlordReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOAD_LANDLORD:
             return { ...state, landlord: action.payload };
         case CREATE_PROPERTY:
-            properties = [...state.landlord.properties, action.payload];
-            return { ...state, landlord: { ...state.landlord, properties } };
+            portfolio = [...state.landlord.portfolio, action.payload];
+            return { ...state, landlord: { ...state.landlord, portfolio } };
         case DELETE_PROPERTY:
-            properties = state.landlord.properties.filter(property => property._id !== action.payload);
-            return { ...state, landlord: { ...state.landlord, properties } }; 
+            portfolio = state.landlord.portfolio.filter(property => property._id !== action.payload);
+            return { ...state, landlord: { ...state.landlord, portfolio } }; 
         case SIGN_OUT:
             return initialState;
         default:

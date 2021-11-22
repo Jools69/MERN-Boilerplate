@@ -6,7 +6,7 @@ import Modal from '../shared components/Modal';
 
 const PropertiesList = (props) => {
 
-    const { properties, onAdd } = props;
+    const { portfolio, onAdd } = props;
 
     const [showModal, setShowModal] = useState(false);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -23,7 +23,7 @@ const PropertiesList = (props) => {
 
     const getNameFor = (propertyId) => {
         if(propertyId) {
-            const property = properties.find(el => el._id === propertyId);
+            const property = portfolio.find(el => el._id === propertyId);
             return property?.property.name || '';
         }
     }
@@ -33,7 +33,7 @@ const PropertiesList = (props) => {
             <React.Fragment>
             <ul className="list-group-flush ps-0">
                 {
-                    properties.map((property) => {
+                    portfolio.map((property) => {
                         return (
                             <li className="list-group-item" key={property._id}>
                                 <Property 
@@ -65,12 +65,12 @@ const PropertiesList = (props) => {
             <div className="card shadow">
                 <div className="card-body">
                     <h4 className="card-title mb-3 mx-2">Property Portfolio</h4>
-                    {properties?.length > 0 &&
+                    {portfolio?.length > 0 &&
                         <React.Fragment>
                             {renderProperties()}
                         </React.Fragment>
                     }
-                    {(!properties || properties?.length === 0) &&
+                    {(!portfolio || portfolio?.length === 0) &&
                         <p className="card-text">You have not yet added any properties</p>
                     }
                 </div>
@@ -86,7 +86,7 @@ const PropertiesList = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        properties: state.landlord.landlord.properties
+        portfolio: state.landlord.landlord.portfolio
     };
 }
 

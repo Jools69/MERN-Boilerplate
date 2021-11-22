@@ -10,6 +10,7 @@ import Signout from './auth/Signout';
 import Dashboard from './core/Dashboard';
 import ForgotPassword from './auth/ForgotPassword';
 import ResetPassword from './auth/ResetPassword';
+import RentalPropertyEdit from './core/properties/RentalPropertyEdit';
 import Admin from './core/Admin';
 
 const Routes = () => {
@@ -23,6 +24,7 @@ const Routes = () => {
                 <Route path="/activate/:token" component={Activate} />
                 <Route path="/password/forgot" component={ForgotPassword} />
                 <Route path="/password/reset/:token" component={ResetPassword} />
+                <Route path="/properties/edit/:propertyId" component={RentalPropertyEdit} />
                 <PrivateRoute path="/dashboard" component={Dashboard} />
                 <AdminRoute path="/admin" component={Admin} />
             </Switch>

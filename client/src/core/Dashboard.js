@@ -7,7 +7,7 @@ import { getCookie } from '../auth/helpers';
 import { connect } from 'react-redux';
 import { loadLandlord, logError, clearError, clearSuccess } from '../redux/actions';
 import Modal from './shared components/Modal';
-import RentalPropertyCreate from './properties/RentalPropertyCreate';
+import RentalPropertyCreateForm from './properties/RentalPropertyCreateForm';
 import PropertiesList from './properties/PropertiesList';
 
 const Dashboard = (props) => {
@@ -73,9 +73,9 @@ const Dashboard = (props) => {
       </div>
       <Modal
         show={showModal}
-        title={<span className="text-muted">Properties</span>}
-        content={<RentalPropertyCreate formId={newformId} formRef={formRef} postAction={closeForm}/>}
-        actions={
+        title={<span className="text-muted">Portfolio</span>}
+        content={showModal && <RentalPropertyCreateForm formId={newformId} formRef={formRef} postAction={closeForm}/>}
+        actions={showModal &&
           <React.Fragment>
             <button className="btn btn-secondary" onClick={closeForm}>Cancel</button>
             <button className="btn btn-primary" type="submit" form={newformId}>Add</button>
