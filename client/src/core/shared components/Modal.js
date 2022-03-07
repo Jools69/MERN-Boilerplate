@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import reactDom from 'react-dom';
-import './Modal.css';
+import './Modal.scss';
 
 const Modal = (props) => {
 
@@ -35,7 +35,7 @@ const Modal = (props) => {
             <div className="modalForeground">
                 <div className="modalParent">
                     <div className="modalTitle">
-                        <h1>{title}</h1>
+                        {title}
                     </div>
                     <div className="modalBody">
                         {content}

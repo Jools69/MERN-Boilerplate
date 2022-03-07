@@ -4,6 +4,7 @@ const Landlord = require('../models/landlord');
 const ExpressError = require('../utils/ExpressError');
 const sgMail = require('@sendgrid/mail');
 const jwt = require('jsonwebtoken');
+const { getDefaultReportingRange } = require('../utils/helpers');
 
 // This is to emulate API delay during local host testing
 const timeOut = 2000;
@@ -122,7 +123,8 @@ exports.activate = async (req, res, next) => {
 
             // Create a new lanbdlord instance
             const newLandlord = new Landlord({
-                userId: savedUser._id
+                userId: savedUser._id,
+                reportingRange: getDefaultReportingRange()
             });
 
             const savedLandlord = await newLandlord.save();
@@ -304,7 +306,7 @@ exports.updatePassword = async (req, res, next) => {
                 let msg = err.message;
                 if (err.name === 'TokenExpiredError')
                     msg = "Password Reset Link expired, please click on forgot password again."
-                return next(new ExpressError(msg, 400));
+                return next(new ExpressError(msg, 400)); 
             }
         
             // The token is valid, so get the user from the DB associated with the password reset request

@@ -9,6 +9,7 @@ import { loadLandlord, logError, clearError, clearSuccess } from '../redux/actio
 import Modal from './shared components/Modal';
 import RentalPropertyCreateForm from './properties/RentalPropertyCreateForm';
 import PropertiesList from './properties/PropertiesList';
+import Overview from './Overview';
 
 const Dashboard = (props) => {
 
@@ -19,21 +20,23 @@ const Dashboard = (props) => {
   useEffect(() => {
 
     if (props.userLoggedIn) {
-      axios({
-        method: 'GET',
-        url: `${process.env.REACT_APP_API}/users/${props.user._id}`,
-        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}` }
-      })
-        .then(response => {
-          const landlordDetails = response.data.landlord;
-          setLoaded(true);
-          props.clearSuccess();
-          // Save the landlord details in the store
-          props.loadLandlord(landlordDetails);
-        })
-        .catch((err) => {
-          props.logError(err.response ? err.response.data.error : err.message);
-        });
+      props.loadLandlord(props.user._id);
+      // setLoaded(true);  
+      // axios({
+      //   method: 'GET',
+      //   url: `${process.env.REACT_APP_API}/users/${props.user._id}`,
+      //   headers: { "Authorization": `Bearer ${getCookie('sessionToken')}` }
+      // })
+      //   .then(response => {
+      //     const landlordDetails = response.data.landlord;
+      //     props.clearSuccess();
+      //     // Save the landlord details in the store
+      //     props.loadLandlord(landlordDetails);
+      //     setLoaded(true);
+      //   })
+      //   .catch((err) => {
+      //     props.logError(err.response ? err.response.data.error : err.message);
+      //   });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -58,14 +61,22 @@ const Dashboard = (props) => {
       <div className="container py-5">
         <Error showClose />
         <Success showClose />
-        {loaded &&
+        {props.landlordLoaded &&
           <div>
             <h1 className="text-primary">Dashboard</h1>
             <h2 className="text-muted py-3">Welcome back {name}</h2>
             <div>
-              <div className="row">
-                <div className="col-lg-6">
+              <div className="row my-2">
+                <div className="col-lg-6 my-2">
                   <PropertiesList onAdd={() => {setShowModal(true)}}/>
+                </div>
+                <div className="col-lg-6 my-2">
+                  <Overview />
+                </div>
+              </div>
+              <div className="row my-2">
+                <div className="col-12">
+                <PropertiesList onAdd={() => {setShowModal(true)}}/>
                 </div>
               </div>
             </div>
@@ -91,6 +102,7 @@ const mapStateToProps = (state) => {
     userLoggedIn: state.user.userLoggedIn,
     user: state.user.user,
     landlord: state.landlord.landlord,
+    landlordLoaded: state.landlord.landlordLoaded,
     error: state.feedback.error
   };
 }

@@ -19,7 +19,15 @@ const landlordSchema = new Schema({
                 default: 100
             }
         }
-    ]
+    ],
+    reportingRange: {
+        startDate: {
+            type: Date
+        },
+        endDate: {
+            type: Date
+        }
+    }
 });
 
 module.exports = mongoose.model('Landlord', landlordSchema);

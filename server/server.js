@@ -10,10 +10,11 @@ const ExpressError = require('./utils/ExpressError');
 
 require('dotenv').config();
 
-// Import auth router
+// Import routers
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const propertyRoutes = require('./routes/properties');
+const incomeRoutes = require('./routes/income');
 
 // Create instance of express.
 const app = express();
@@ -67,6 +68,8 @@ app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 // Use the properties router to handle property routes.
 app.use('/api/properties', propertyRoutes);
+// Use the income router to handle income routes.
+app.use('/api/income', incomeRoutes);
 
 // If we get here, an unsupported URL was requested.
 app.all('*', (req, res, next) => {

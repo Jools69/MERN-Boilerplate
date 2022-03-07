@@ -14,7 +14,7 @@ exports.create = async (req, res, next) => {
             postcode,
             currency,
             propertyType = 'Other Property Unfurnished',
-            percentOwned = 100 } = req.body;
+            percentOwned = 100 } = req.body.property;
         // Create a new Property instance based on the request body
         const newProperty = new Property({
             name, line1, line2, line3, city, postcode, currency, propertyType
@@ -64,13 +64,38 @@ exports.findById = async (req, res, next) => {
     }
 }
 
-exports.update = (req, res, next) => {
-    const { id } = req.params;
-    const { property } = req.body;
-    return res.json({
-        id,
-        property
-    });
+exports.update = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = req.user;                  // Added by authController.authenticate()
+        const { property } = req.body;
+
+        const updatedProperty = await Property.findByIdAndUpdate(id, { ...property }, async (err, doc) => {
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                })
+            }
+            // Find the updating landlord to update the percent owned
+            const landlord = await Landlord.findOneAndUpdate({ userId: user.id }, 
+                                                             { $set: { "portfolio.$[el].percentOwned": property.percentOwned } },
+                                                             { 
+                                                                 arrayFilters: [{ "el.property": id }],
+                                                                 new: true
+                                                             }
+                                                             );
+    
+            return res.json({
+                updatedProperty,
+                message: `${property.name} property updated successfully`
+            });
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            error: err.message
+        });
+    }
 }
 
 exports.delete = async (req, res, next) => {
@@ -87,13 +112,13 @@ exports.delete = async (req, res, next) => {
 
         if (landlord) {
             // First, get the id of the portfolio entry that needs to be deleted.
-            const propertyToCheck = landlord.portfolio.find(p =>  {
+            const propertyToCheck = landlord.portfolio.find(p => {
                 return p.id.toString() === propertyId;
             });
 
             // Delete the provided property from the landlord's portfolio array
             await Landlord.findByIdAndUpdate(landlord.id, { $pull: { portfolio: { _id: propertyId } } });
-            
+
             // Find any other Landlords that "own" the property
             const otherLandlord = await Landlord.findOne({ 'portfolio.property': propertyToCheck.property });
 

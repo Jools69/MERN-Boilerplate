@@ -1,0 +1,10 @@
+@import "../node_modules/bootstrap//scss/bootstrap.scss";
+
+.bg-teal { background-color: $teal }
+.bg-purple { background-color: $purple }
+.bg-indigo { background-color: $indigo }
+.text-purple { color: $purple }
+
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}

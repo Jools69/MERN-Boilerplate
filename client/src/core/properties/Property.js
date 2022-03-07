@@ -16,7 +16,6 @@ const Property = (props) => {
                 <Link to={`/properties/edit/${property._id}`} className="me-3"><i className="bi bi-pencil-fill text-success" /></Link>
                 <Link to='#' onClick={onDelete}><i className="bi bi-trash-fill text-danger" /></Link>
             </div>
-
         </div>
     );
 }

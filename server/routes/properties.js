@@ -5,6 +5,8 @@ const express = require('express');
 const properties = require('../controllers/propertyController');
 const { authenticate } = require('../controllers/authController');
 const { csrfProtection } = require('../middleware');
+const { runValidation } = require('../validators');
+const { propertyValidator } = require('../validators/property');
 
 // Create an instance of the Express router.
 const router = express.Router();
@@ -16,14 +18,12 @@ const router = express.Router();
 router.route('/')
     // Handle creation of a new Property
     // .post(csrfProtection, authenticate, properties.create);
-    .post( authenticate, properties.create);
+    .post(csrfProtection, authenticate, propertyValidator, runValidation, properties.create);
 
 // property-specific routes.
 router.route('/:id')
     .get(authenticate, properties.findById)
-    .put(authenticate, properties.update)
-    // .put(csrfProtection, authenticate, properties.update)
+    .put(csrfProtection, authenticate, propertyValidator, runValidation, properties.update)
     .delete(csrfProtection, authenticate, properties.delete);
-    // .delete(authenticate, properties.delete);
 
 module.exports = router;

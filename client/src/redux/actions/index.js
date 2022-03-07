@@ -2,6 +2,7 @@ import axios from 'axios';
 import { signOut, getCookie } from '../../auth/helpers';
 import { 
     LOAD_LANDLORD, 
+    UPDATE_LANDLORD_DATES, 
     SIGN_IN, 
     SIGN_OUT,
     CREATE_PROPERTY,
@@ -35,20 +36,52 @@ export const saveCSRFToken = (csrfToken) => {
     };
 };
 
-export const loadLandlord = (landlord) => dispatch => {
-    dispatch({
-        type: LOAD_LANDLORD,
-        payload: landlord
+export const loadLandlord = (userId) => dispatch => {
+
+    axios({
+        method: 'GET',
+        url: `${process.env.REACT_APP_API}/users/${userId}`,
+        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}` }
+    })
+    .then(response => {
+        const landlordDetails = response.data.landlord;
+        dispatch({
+            type: CLEAR_SUCCESS
+        });
+        // Save the landlord details in the store
+        dispatch({
+            type: LOAD_LANDLORD,
+            payload: landlordDetails
+        });
+    })
+    .catch((err) => {
+        const errMsg = err.response ? err.response.data.error : err.message;
+        dispatch({
+            type: LOG_ERROR,
+            payload: errMsg
+        });
     });
 }
 
-export const createRentalProperty = (property) => dispatch => {
+// export const loadLandlord = (landlord) => dispatch => {
+//     dispatch({
+//         type: LOAD_LANDLORD,
+//         payload: landlord
+//     });
+// }
+
+export const createRentalProperty = (property) => (dispatch, getState) => {
+
+    const csrfToken = getState().user.csrfToken;
+
     // perform an axios POST to the properties url
     axios({
         method: 'POST',
         url: `${process.env.REACT_APP_API}/properties`,
-        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}` },
-        data: property
+        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}`,
+        "csrf-token": csrfToken },
+        withCredentials: true,
+        data: { property }
     })
     .then(response => {
         dispatch({
@@ -72,22 +105,28 @@ export const updateRentalProperty = (id, property) => (dispatch, getState) => {
 
     const csrfToken = getState().user.csrfToken;
     
-    // perform an axios POST to the properties url
+    // perform an axios PUT to the properties url
     axios({
         method: 'PUT',
         url: `${process.env.REACT_APP_API}/properties/${id}`,
         headers: { "Authorization": `Bearer ${getCookie('sessionToken')}`,
                    "csrf-token": csrfToken },
+        withCredentials: true,
         data: { id, property }
     })
     .then(response => {
+        console.log("Response object: ", response);
         dispatch({
             type: UPDATE_PROPERTY,
             payload: response.data.updatedProperty
         });
         dispatch({
             type: CLEAR_ERROR
-        })
+        });
+        dispatch({
+            type: LOG_SUCCESS,
+            payload: response.data.message
+        });
     })
     .catch(err => {
         const errMsg = err.response.data.error;
@@ -133,6 +172,45 @@ export const logError = (error)  => {
         type: LOG_ERROR, 
         payload: error
     };
+}
+
+export const updateReportingRange = (startDate, endDate) => (dispatch, getState) => {
+
+    console.log(startDate, endDate);
+
+    const csrfToken = getState().user.csrfToken;
+
+    // perform an axios PUT to the income/updateDateRange url
+    axios({
+        method: 'PUT',
+        url: `${process.env.REACT_APP_API}/income/dateRange`,
+        headers: { "Authorization": `Bearer ${getCookie('sessionToken')}`,
+                   "csrf-token": csrfToken },
+        withCredentials: true,
+        data: { startDate, endDate }
+    })
+    .then(response => {
+        console.log("Response object: ", response);
+        dispatch({
+            type: UPDATE_LANDLORD_DATES,
+            payload: response.data
+        });
+        dispatch({
+            type: CLEAR_ERROR
+        });
+        dispatch({
+            type: LOG_SUCCESS,
+            payload: response.data.message
+        });
+    })
+    .catch(err => {
+        const errMsg = err.response.data.error;
+        dispatch({
+            type: LOG_ERROR,
+            payload: errMsg
+        });
+    });
+
 }
 
 export const clearError = ()  => {
